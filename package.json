@@ -1,0 +1,28 @@
+{
+  "engines": {
+	"node": "14.18.1"
+  }, 
+  "name": "esp_lucioles_wln",
+  "version": "1.0.0",
+  "description": "",
+  "main": "node_lucioles_v4.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+	"start": "node_lucioles_v4.js"      
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nicolas-Corbiere/ESP_Lucioles_WLN.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Nicolas-Corbiere/ESP_Lucioles_WLN/issues"
+  },
+  "homepage": "https://github.com/Nicolas-Corbiere/ESP_Lucioles_WLN#readme",
+  "dependencies": {
+    "express": "^4.17.3",
+    "mongodb": "^4.5.0",
+    "mqtt": "^4.3.7"
+  }
+}
