@@ -104,7 +104,7 @@ function get_samples(path_on_node, serie, wh){
     // serie => for choosing chart/serie on the page
     // wh => which esp do we want to query data
     
-    node_url = 'https://esplucioleswln.herokuapp.com:3000'
+    node_url = 'https://esplucioleswln.herokuapp.com'
     //node_url = 'http://localhost:3000'
     //node_url = 'http://134.59.131.45:3000'
     //node_url = 'http://192.168.1.101:3000'
