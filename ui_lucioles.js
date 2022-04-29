@@ -72,7 +72,7 @@ function init() {
 
 //=== Installation de la periodicite des requetes GET============
 function process_esp(which_esps,i){
-    const refreshT = 10000 // Refresh period for chart
+    const refreshT = 1000 // Refresh period for chart
     esp = which_esps[i];    // L'ESP "a dessiner"
     //console.log(esp) // cf console du navigateur
     
@@ -104,8 +104,8 @@ function get_samples(path_on_node, serie, wh){
     // serie => for choosing chart/serie on the page
     // wh => which esp do we want to query data
     
-    node_url = 'https://iot21801114m1.herokuapp.com'
-    //node_url = 'http://localhost:3000'
+    //node_url = 'https://iot21801114m1.herokuapp.com'
+    node_url = 'http://localhost:3000'
     //node_url = 'http://134.59.131.45:3000'
     //node_url = 'http://192.168.1.101:3000'
 
