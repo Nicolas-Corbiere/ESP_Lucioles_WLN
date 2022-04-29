@@ -78,20 +78,20 @@ function process_esp(which_esps,i){
     
     // Gestion de la temperature
     // premier appel pour eviter de devoir attendre RefreshT
-    get_samples('/esp/tempNicoC', chart1.series[i], esp);
+    get_samples('/esp/tempWLN', chart1.series[i], esp);
     //calls a function or evaluates an expression at specified
     //intervals (in milliseconds).
     window.setInterval(get_samples,
 		       refreshT,
-		       '/esp/tempNicoC',     // param 1 for get_samples()
+		       '/esp/tempWLN',     // param 1 for get_samples()
 		       chart1.series[i],// param 2 for get_samples()
 		       esp);            // param 3 for get_samples()
 
     // Gestion de la lumiere
-    get_samples('/esp/lightNicoC', chart2.series[i], esp);
+    get_samples('/esp/lightWLN', chart2.series[i], esp);
     window.setInterval(get_samples,
 		       refreshT,
-		       '/esp/lightNicoC',     // URL to GET
+		       '/esp/lightWLN',     // URL to GET
 		       chart2.series[i], // Serie to fill
 		       esp);             // ESP targeted
 }

@@ -10,8 +10,8 @@ var path = require('path');
 //--- MQTT module
 const mqtt = require('mqtt')
 // Topics MQTT
-const TOPIC_LIGHT = 'sensors/lightNicoC'
-const TOPIC_TEMP  = 'sensors/tempNicoC'
+const TOPIC_LIGHT = 'sensors/lightWLN'
+const TOPIC_TEMP  = 'sensors/tempWLN'
 
 //---  The MongoDB module exports MongoClient, and that's what
 // we'll use to connect to a MongoDB database.
