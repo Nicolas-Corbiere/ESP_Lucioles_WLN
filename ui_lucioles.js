@@ -65,9 +65,37 @@ function init() {
     ]
     
     for (var i = 0; i < which_esps.length; i++) {
-	process_esp(which_esps, i)
+	    process_esp(which_esps, i)
     }
+
+    creatMap()
 };
+
+function creatMap() {
+    var villes = {
+        "ESP1 - 21801114": { "lat": 41.91, "lon": 8.73 },
+        "ESP2 - 21800822 ": { "lat": 22.396 , "lon": 114.10 },
+        "ESP3 - 22003176 ": { "lat": 51.536, "lon": -0.247 },
+    };
+
+    // Créer l'objet "macarte" et l'insèrer dans l'élément HTML qui a l'ID "map"
+    var lat = 48.852969;
+    var lon = 50.349903;
+	// Créer l'objet "macarte" et l'insèrer dans l'élément HTML qui a l'ID "map"
+	macarte = L.map('map').setView([lat, lon], 3);
+	// Leaflet ne récupère pas les cartes (tiles) sur un serveur par défaut. Nous devons lui préciser où nous souhaitons les récupérer. Ici, openstreetmap.fr
+	L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
+		// Il est toujours bien de laisser le lien vers la source des données
+		attribution: 'données © OpenStreetMap/ODbL - rendu OSM France',
+		minZoom: 1,
+		maxZoom: 20
+	}).addTo(macarte);
+	// Nous parcourons la liste des villes
+	for (ville in villes) {
+		var marker = L.marker([villes[ville].lat, villes[ville].lon]).addTo(macarte);
+        marker.bindPopup(ville);
+	}               	
+}
 
 
 //=== Installation de la periodicite des requetes GET============
