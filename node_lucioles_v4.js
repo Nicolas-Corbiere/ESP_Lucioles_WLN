@@ -76,7 +76,6 @@ async function v0(){
 	//===============================================
 	// Connexion au broker MQTT distant
 	//
-	//const mqtt_url = 'http://192.168.1.11:1883'
 	//const mqtt_url = 'http://broker.hivemq.com'
 	const mqtt_url = 'http://test.mosquitto.org:1883'
 
@@ -237,12 +236,6 @@ app.get('/esp/:what', function (req, res) {
 //==== Demarrage du serveur Web  =======================
 //================================================================
 // L'application est accessible sur le port 3000
-/*
-app.listen(3000, () => {
-    console.log('Server listening on port 3000');
-});
-*/
-
 
 var listener = app.listen(process.env.PORT || 3000, function(){
     console.log('Express Listening on port ' + listener.address().port); //Listening on port 8888

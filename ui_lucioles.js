@@ -27,7 +27,6 @@ function init() {
         series: [{name: 'ESP1', data: []},
 		 {name: 'ESP2', data: []},
 		 {name: 'ESP3', data: []}],
-	//colors: ['#6CF', '#39F', '#06C', '#036', '#000'],
 	colors: ['red', 'green', 'blue'],
         plotOptions: {line: {dataLabels: {enabled: true},
 			     //color: "red",
@@ -45,7 +44,6 @@ function init() {
 	series: [{name: 'ESP1', data: []},
 		 {name: 'ESP2', data: []},
 		 {name: 'ESP3', data: []}],
-	//colors: ['#6CF', '#39F', '#06C', '#036', '#000'],
 	colors: ['red', 'green', 'blue'],
         plotOptions: {line: {dataLabels: {enabled: true},
 			     enableMouseTracking: true
@@ -58,10 +56,6 @@ function init() {
         "24:6F:28:0B:0F:30",
         "80:7D:3A:FD:D6:AC",
         "80:7D:3A:FD:D9:FC"
-        //"DE:9B:27:AA:6B:55"
-        //"80:7D:3A:FD:E8:48"
-//	,"1761716416"
-//	"80:7D:3A:FD:C9:44"
     ]
     
     for (var i = 0; i < which_esps.length; i++) {
@@ -134,8 +128,6 @@ function get_samples(path_on_node, serie, wh){
     
     node_url = 'https://iot21801114m1.herokuapp.com'
     //node_url = 'http://localhost:3000'
-    //node_url = 'http://134.59.131.45:3000'
-    //node_url = 'http://192.168.1.101:3000'
 
     // envoi des datas au html
 
@@ -159,7 +151,6 @@ function get_samples(path_on_node, serie, wh){
         }
     });
 }
-
 
 //assigns the onload event to the function init.
 //=> When the onload event fires, the init function will be run. 
