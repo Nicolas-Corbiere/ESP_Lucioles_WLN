@@ -74,6 +74,7 @@ function init() {
             process_esp(list_ESP[i]);
         }
     }
+
 };
 
 /**
@@ -129,7 +130,7 @@ function get_samples(path_on_node, esp){
     // wh => which esp do we want to query data
     
     node_url = 'https://iot21801114m1.herokuapp.com'
-    //node_url = 'http://localhost:3001'
+    //node_url = 'http://localhost:3000'
 
     // envoi des datas au html
 
@@ -214,7 +215,6 @@ function createEspIdentListe(){
         }
     });
 }
-
 
 //assigns the onload event to the function init.
 //=> When the onload event fires, the init function will be run. 

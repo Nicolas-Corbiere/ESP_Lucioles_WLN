@@ -10,9 +10,8 @@ var path = require('path');
 //--- MQTT module
 const mqtt = require('mqtt')
 // Topics MQTT
-//const TOPIC_LIGHT = 'sensors/lightWLN2'
-//const TOPIC_TEMP  = 'sensors/tempWLN2'
 const TOPIC_WLN  = 'sensors/WLN'
+
 
 //---  The MongoDB module exports MongoClient, and that's what
 // we'll use to connect to a MongoDB database.
@@ -303,8 +302,7 @@ v0().catch(console.error);
 //==== Demarrage du serveur Web  =======================
 //================================================================
 // L'application est accessible sur le port 3000
-
-var listener = app.listen(process.env.PORT || 3001, function(){
+var listener = app.listen(process.env.PORT || 3000, function(){
     console.log('Express Listening on port ' + listener.address().port); //Listening on port 8888
 });
 
