@@ -1,3 +1,7 @@
+/**
+ * Classe pour les attributs d'un ESP
+ */
+
 class Esp {
     constructor(name, mac, map, lat, lon){
         this.name = name;

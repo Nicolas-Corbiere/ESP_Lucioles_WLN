@@ -52,7 +52,7 @@ function init() {
 		     }
     });
 
-    /*
+    /* ancienne version = codée en dur 
     //=== Gestion de la flotte d'ESP ========================   =========
     var which_esps = [
         "24:6F:28:0B:0F:30", //Nico
@@ -68,7 +68,7 @@ function init() {
     // appel de la création de la map
     createMap()
     createEspIdentListe();
-    //
+    // Gestion de la flotte d'ESP
     if(list_ESP.length) {
         for (var i = 0; i < list_ESP.length; i++) {
             process_esp(list_ESP[i]);
@@ -100,7 +100,6 @@ function createMap() {
 //=== Installation de la periodicite des requetes GET============
 function process_esp(esp){
     const refreshT = 10000 // Refresh period for chart
-    //esp = which_esps[i];    // L'ESP "a dessiner"
     //console.log(esp) // cf console du navigateur
 
     // Gestion de la temperature
@@ -143,7 +142,6 @@ function get_samples(path_on_node, esp){
             let listeData = [];
             resultat.forEach(function (element) {
 		listeData.push([Date.parse(element.date),element.value]);
-		//listeData.push([Date.now(),element.value]);
             });
             if(path_on_node == "/esp/tempWLN") {
                 if(esp.getTemperatureSerie() == undefined){
@@ -189,7 +187,7 @@ function get_samples(path_on_node, esp){
 
 function createEspIdentListe(){
     node_url = 'https://iot21801114m1.herokuapp.com'
-    //node_url = 'http://localhost:3001'
+    //node_url = 'http://localhost:3000'
 
     // envoi des datas au html
 
@@ -217,7 +215,7 @@ function createEspIdentListe(){
 
 function createEspIdentListe(){
     node_url = 'https://iot21801114m1.herokuapp.com'
-    //node_url = 'http://localhost:3001'
+    //node_url = 'http://localhost:3000'
 
     // envoi des datas au html
 

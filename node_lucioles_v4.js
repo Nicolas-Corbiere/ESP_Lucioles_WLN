@@ -64,7 +64,6 @@ async function listDatabases(client){
 async function v0(){
     const mongoName = "lucioles"                   //Nom de la base
     //const mongoUri = 'mongodb://localhost:27017/'; //URL de connection		
-    //const mongoUri = 'mongodb://10.9.128.189:27017/'; //URL de connection		
     const mongoUri = 'mongodb+srv://ncorbiere:ZDEZU8Lf2wWb-af@lucioles.avy5p.mongodb.net/myFirstDatabase?retryWrites=true&w=majority' ;
 
     //Now that we have our URI, we can create an instance of MongoClient.
@@ -83,29 +82,9 @@ async function v0(){
 	// Get a connection to the DB "lucioles" or create
 	dbo = mg_client.db(mongoName);
 
-	/*
-	// Remove "old collections : temp and light
-	dbo.listCollections({name: "temp"})
-	    .next(function(err, collinfo) {
-		if (collinfo) { // The collection exists
-		    //console.log('Collection temp already exists');
-		    dbo.collection("temp").drop() 
-		}
-	    });
-
-	dbo.listCollections({name: "light"})
-	    .next(function(err, collinfo) {
-		if (collinfo) { // The collection exists
-		    //console.log('Collection temp already exists');
-		    dbo.collection("light").drop() 
-		}
-	    });
-		*/
-
 	//===============================================
 	// Connexion au broker MQTT distant
 	//
-	//const mqtt_url = 'http://broker.hivemq.com'
 	const mqtt_url = 'http://test.mosquitto.org:1883'
 
 	var client_mqtt = mqtt.connect(mqtt_url);
@@ -114,14 +93,6 @@ async function v0(){
 	// Des la connexion, le serveur NodeJS s'abonne aux topics MQTT 
 	//
 	client_mqtt.on('connect', function () {
-		/*
-	    client_mqtt.subscribe(TOPIC_LIGHT, function (err) {
-		if (!err) {
-		    //client_mqtt.publish(TOPIC_LIGHT, 'Hello mqtt')
-		    console.log('Node Server has subscribed to ', TOPIC_LIGHT);
-		}
-	    })
-		*/
 	    client_mqtt.subscribe(TOPIC_WLN, function (err) {
 		if (!err) {
 		    //client_mqtt.publish(TOPIC_TEMP, 'Hello mqtt')
