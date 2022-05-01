@@ -10,8 +10,9 @@ var path = require('path');
 //--- MQTT module
 const mqtt = require('mqtt')
 // Topics MQTT
-const TOPIC_LIGHT = 'sensors/lightNicoC'
-const TOPIC_TEMP  = 'sensors/tempNicoC'
+//const TOPIC_LIGHT = 'sensors/lightWLN2'
+//const TOPIC_TEMP  = 'sensors/tempWLN2'
+const TOPIC_WLN  = 'sensors/WLN'
 
 //---  The MongoDB module exports MongoClient, and that's what
 // we'll use to connect to a MongoDB database.
@@ -19,6 +20,35 @@ const TOPIC_TEMP  = 'sensors/tempNicoC'
 // access the database in that cluster,
 // and close the connection to that cluster.
 const {MongoClient} = require('mongodb');
+
+//====================================
+// Utilisation du framework express
+// Notamment g�r�r les routes
+const express = require('express');
+// et pour permettre de parcourir les body des requetes
+const bodyParser = require('body-parser');
+
+const app = express();
+
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json())
+app.use(express.static(path.join(__dirname, '/')));
+app.use(function(request, response, next) { //Pour eviter les problemes de CORS/REST
+	response.header("Access-Control-Allow-Origin", "*");
+	response.header("Access-Control-Allow-Headers", "*");
+	response.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE");
+	next();
+});
+
+//================================================================
+// Answering GET request on this node ... probably from navigator.
+// => REQUETES HTTP reconnues par le Node
+//================================================================
+
+// Route / => Le node renvoie la page HTML affichant les charts
+app.get('/', function (req, res) {
+	res.sendFile(path.join(__dirname + '/ui_lucioles.html'));
+});
 
 //----------------------------------------------------------------
 // This function will retrieve a list of databases in our cluster and
@@ -56,6 +86,7 @@ async function v0(){
 	// Get a connection to the DB "lucioles" or create
 	dbo = mg_client.db(mongoName);
 
+	/*
 	// Remove "old collections : temp and light
 	dbo.listCollections({name: "temp"})
 	    .next(function(err, collinfo) {
@@ -72,11 +103,11 @@ async function v0(){
 		    dbo.collection("light").drop() 
 		}
 	    });
+		*/
 
 	//===============================================
 	// Connexion au broker MQTT distant
 	//
-	//const mqtt_url = 'http://192.168.1.11:1883'
 	//const mqtt_url = 'http://broker.hivemq.com'
 	const mqtt_url = 'http://test.mosquitto.org:1883'
 
@@ -86,16 +117,18 @@ async function v0(){
 	// Des la connexion, le serveur NodeJS s'abonne aux topics MQTT 
 	//
 	client_mqtt.on('connect', function () {
+		/*
 	    client_mqtt.subscribe(TOPIC_LIGHT, function (err) {
 		if (!err) {
 		    //client_mqtt.publish(TOPIC_LIGHT, 'Hello mqtt')
 		    console.log('Node Server has subscribed to ', TOPIC_LIGHT);
 		}
 	    })
-	    client_mqtt.subscribe(TOPIC_TEMP, function (err) {
+		*/
+	    client_mqtt.subscribe(TOPIC_WLN, function (err) {
 		if (!err) {
 		    //client_mqtt.publish(TOPIC_TEMP, 'Hello mqtt')
-		    console.log('Node Server has subscribed to ', TOPIC_TEMP);
+		    console.log('Node Server has subscribed to ', TOPIC_WLN);
 		}
 	    })
 	})
@@ -105,14 +138,34 @@ async function v0(){
 	// lesquels on s'est inscrit.
 	// => C'est cette fonction qui alimente la BD !
 	//
-	client_mqtt.on('message', function (topic, message) {
+	client_mqtt.on('message', callback);
+
+	async function callback(topic, message) {
 	    console.log("\nMQTT msg on topic : ", topic.toString());
 	    console.log("Msg payload : ", message.toString());
 
 	    // Parsing du message suppos� recu au format JSON
 	    message = JSON.parse(message);
-	    wh = message.who
-	    val = message.value
+	    wh = message.info.ident;
+	    val_temp = message.status.temperature;
+		val_light = message.status.light;
+		user = message.info.user;
+		lat = message.info.loc.lat;
+		lgn = message.info.loc.lgn;
+		// on vérifie que l'esp existe déjà dans la liste , sinon on l'ajoute
+		if (await dbo.collection("esp_listes").countDocuments({ident:wh}) == 0){ //si on a au moins un doc
+			let esp_entry =
+				{
+					user:user,
+					ident:wh,
+					lat:lat,
+					lgn:lgn
+				}
+			dbo.collection("esp_listes").insertOne(esp_entry, function(err, res) {
+				if (err) throw err;
+				console.log("\n Nouveau ESP ajouté", esp_entry);
+				});
+		}
 
 	    // Debug : Gerer une liste de who pour savoir qui utilise le node server	
 	    let wholist = []
@@ -129,20 +182,31 @@ async function v0(){
 	    // vs https://jsfiddle.net/BlackLabel/tgahn7yv
 	    // var frTime = new Date().toLocaleString("fr-FR", {timeZone: "Europe/Paris"});
 	    var frTime = new Date().toLocaleString("sv-SE", {timeZone: "Europe/Paris"});
-	    var new_entry = { date: frTime, // timestamp the value 
+	    var new_temp_entry = { date: frTime, // timestamp the value
 			      who: wh,      // identify ESP who provide 
-			      value: val    // this value
+			      value: val_temp    // this value
 			    };
+		var new_light_entry = { date: frTime, // timestamp the value
+			who: wh,      // identify ESP who provide
+			value: val_light    // this value
+		};
+
 	    
 	    // On recupere le nom basique du topic du message
-	    var key = path.parse(topic.toString()).base;
+	    //var key = path.parse(topic.toString()).base;
 	    // Stocker le dictionnaire qui vient d'etre cr�� dans la BD
 	    // en utilisant le nom du topic comme key de collection
-	    dbo.collection(key).insertOne(new_entry, function(err, res) {
+	    dbo.collection("esp_data_temp").insertOne(new_temp_entry, function(err, res) {
 		if (err) throw err;
-		console.log("\nItem : ", new_entry, 
-		"\ninserted in db in collection :", key);
+		console.log("\nItem : ", new_temp_entry,
+		"\ninserted in db in temp collection :");
 	    });
+
+		dbo.collection("esp_data_light").insertOne(new_light_entry, function(err, res) {
+			if (err) throw err;
+			console.log("\nItem : ", new_light_entry,
+				"\ninserted in db in light collection :");
+		});
 
 	    // Debug : voir les collections de la DB 
 	    //dbo.listCollections().toArray(function(err, collInfos) {
@@ -150,9 +214,69 @@ async function v0(){
 		// that look like: { name: 'test', options: {} }
 	    //	console.log("List of collections currently in DB: ", collInfos); 
 	    //});
-	}) // end of 'message' callback installation
+	} // end of 'message' callback installation
 
-	//================================================================
+
+
+// The request contains the name of the targeted ESP !
+//     /esp/temp?who=80%3A7D%3A3A%3AFD%3AC9%3A44
+// Exemple d'utilisation de routes dynamiques
+//    => meme fonction pour /esp/temp et /esp/light
+		app.get('/esp/:what', function (req, res) {
+			// cf https://stackabuse.com/get-query-strings-and-parameters-in-express-js/
+			console.log(req.originalUrl);
+
+			wh = req.query.who // get the "who" param from GET request
+			// => gives the Id of the ESP we look for in the db
+			wa = req.params.what // get the "what" from the GET request : temp or light ?
+
+			console.log("\n--------------------------------");
+			console.log("A client/navigator ", req.ip);
+			console.log("sending URL ",  req.originalUrl);
+			console.log("wants to GET ", wa);
+			console.log("values from object ", wh);
+
+			// R�cup�ration des nb derniers samples stock�s dans
+			// la collection associ�e a ce topic (wa) et a cet ESP (wh)
+			const nb = 200;
+			let collection_name = "";
+			if(wa == "lightWLN"){
+				collection_name = "esp_data_light";
+			} else if( wa == "tempWLN"){
+				collection_name = "esp_data_temp";
+			}
+			//dbo.collection(key).find({who:wh}).toArray(function(err,result) {
+			dbo.collection(collection_name).find({who:wh}).sort({_id:-1}).limit(nb).toArray(function(err, result) {
+				if (err) throw err;
+				//console.log(result);
+				res.json(result.reverse()); // This is the response.
+				console.log('end find');
+			});
+			console.log('end app.get');
+		});
+
+		app.get('/espList', function (req, res) {
+
+			dbo.collection("esp_listes").find().toArray(function (err, result) {
+				if (err) throw err;
+				res.json(result);
+			});
+
+		});
+
+		// On crée une route pour renvoyer la liste des esp
+		app.get('/list', function (req, res) {
+			console.log("reezre");
+			dbo.collection("esp_listes").find().toArray(function(err, result) {
+				if (err) throw err;
+
+				res.json(result); // This is the response.
+			});
+			console.log('end app.get');
+		});
+
+
+		//================================================================
 	// Fermeture de la connexion avec la DB lorsque le NodeJS se termine.
 	//
 	process.on('exit', (code) => {
@@ -163,6 +287,8 @@ async function v0(){
 	})
 	
     });// end of MongoClient.connect
+
+
 }// end def main
 
 //================================================================
@@ -170,81 +296,15 @@ async function v0(){
 //================================================================
 v0().catch(console.error);
 
-//====================================
-// Utilisation du framework express
-// Notamment g�r�r les routes 
-const express = require('express');
-// et pour permettre de parcourir les body des requetes
-const bodyParser = require('body-parser');
-
-const app = express();
-
-app.use(bodyParser.urlencoded({ extended: true }))
-app.use(bodyParser.json())
-app.use(express.static(path.join(__dirname, '/')));
-app.use(function(request, response, next) { //Pour eviter les problemes de CORS/REST
-    response.header("Access-Control-Allow-Origin", "*");
-    response.header("Access-Control-Allow-Headers", "*");
-    response.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE");
-    next();
-});
-
-//================================================================
-// Answering GET request on this node ... probably from navigator.
-// => REQUETES HTTP reconnues par le Node
-//================================================================
-    
-// Route / => Le node renvoie la page HTML affichant les charts
-app.get('/', function (req, res) {
-    res.sendFile(path.join(__dirname + '/ui_lucioles.html'));
-});
 
 
-// The request contains the name of the targeted ESP !
-//     /esp/temp?who=80%3A7D%3A3A%3AFD%3AC9%3A44
-// Exemple d'utilisation de routes dynamiques
-//    => meme fonction pour /esp/temp et /esp/light
-app.get('/esp/:what', function (req, res) {
-    // cf https://stackabuse.com/get-query-strings-and-parameters-in-express-js/
-    console.log(req.originalUrl);
-    
-    wh = req.query.who // get the "who" param from GET request
-    // => gives the Id of the ESP we look for in the db	
-    wa = req.params.what // get the "what" from the GET request : temp or light ?
-    
-    console.log("\n--------------------------------");
-    console.log("A client/navigator ", req.ip);
-    console.log("sending URL ",  req.originalUrl);
-    console.log("wants to GET ", wa);
-    console.log("values from object ", wh);
-    
-    // R�cup�ration des nb derniers samples stock�s dans
-    // la collection associ�e a ce topic (wa) et a cet ESP (wh)
-    const nb = 200;
-    key = wa
-    //dbo.collection(key).find({who:wh}).toArray(function(err,result) {
-    dbo.collection(key).find({who:wh}).sort({_id:-1}).limit(nb).toArray(function(err, result) {
-	if (err) throw err;
-	console.log('get on ', key);
-	console.log(result);
-	res.json(result.reverse()); // This is the response.
-	console.log('end find');
-    });
-    console.log('end app.get');
-});
 
 //================================================================
 //==== Demarrage du serveur Web  =======================
 //================================================================
 // L'application est accessible sur le port 3000
-/*
-app.listen(3000, () => {
-    console.log('Server listening on port 3000');
-});
-*/
 
-
-var listener = app.listen(process.env.PORT || 3000, function(){
+var listener = app.listen(process.env.PORT || 3001, function(){
     console.log('Express Listening on port ' + listener.address().port); //Listening on port 8888
 });
 
