@@ -1,14 +1,14 @@
 {
   "engines": {
-	"node": "14.18.1"
-  }, 
+    "node": "14.18.1"
+  },
   "name": "esp_lucioles_wln",
   "version": "1.0.0",
   "description": "",
   "main": "node_lucioles_v4.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-	"start": "node_lucioles_v4.js"      
+    "start": "node_lucioles_v4.js"
   },
   "repository": {
     "type": "git",
