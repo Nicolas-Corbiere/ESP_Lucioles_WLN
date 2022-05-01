@@ -74,6 +74,7 @@ function init() {
             process_esp(list_ESP[i]);
         }
     }
+
 };
 
 /**
@@ -129,8 +130,7 @@ function get_samples(path_on_node, esp){
     // wh => which esp do we want to query data
     
     node_url = 'https://iot21801114m1.herokuapp.com'
-    //node_url = 'http://localhost:3001'
-
+    //node_url = 'http://localhost:3000'
     // envoi des datas au html
 
     //https://openclassrooms.com/fr/courses/1567926-un-site-web-dynamique-avec-jquery/1569648-le-fonctionnement-de-ajax
@@ -215,6 +215,33 @@ function createEspIdentListe(){
     });
 }
 
+function createEspIdentListe(){
+    node_url = 'https://iot21801114m1.herokuapp.com'
+    //node_url = 'http://localhost:3001'
+
+    // envoi des datas au html
+
+    //https://openclassrooms.com/fr/courses/1567926-un-site-web-dynamique-avec-jquery/1569648-le-fonctionnement-de-ajax
+    $.ajax({
+        url: node_url.concat("/espList"), // URL to "GET" : /esp/temp ou /esp/light
+        type: 'GET',
+        headers: { Accept: "application/json", },
+        success: function (resultat, statut) { // Anonymous function on success
+            resultat.forEach(function (esp) {
+                if(!list_ident_ESP.length || !list_ident_ESP.includes(esp.ident)){
+                    let new_esp = new Esp(esp.user,esp.ident,macarte,esp.lat,esp.lgn);
+                    list_ident_ESP.push(esp.ident);
+                    list_ESP.push(new_esp)
+                    process_esp(new_esp);
+                }
+            });
+        },
+        error: function (resultat, statut, erreur) {
+        },
+        complete: function (resultat, statut) {
+        }
+    });
+}
 
 //assigns the onload event to the function init.
 //=> When the onload event fires, the init function will be run. 
